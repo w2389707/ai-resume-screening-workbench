@@ -1,0 +1,1 @@
+ALTER TABLE "BatchItem" ADD COLUMN "evidenceJson" TEXT NOT NULL DEFAULT '[]';

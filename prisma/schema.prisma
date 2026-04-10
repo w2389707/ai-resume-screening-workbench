@@ -1,0 +1,55 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Batch {
+  id        String      @id @default(cuid())
+  name      String
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  items     BatchItem[]
+}
+
+model BatchItem {
+  id                   String           @id @default(cuid())
+  batchId              String
+  batch                Batch            @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  originalName         String
+  fileName             String
+  processingState      String           @default("Queued")
+  aiLabel              String?
+  suggestedStatus      String?
+  mainType             String?
+  secondaryLabelsJson  String           @default("[]")
+  evidenceJson         String           @default("[]")
+  strongestEvidence    String?
+  aiStrength           String?
+  evidenceCompleteness String?
+  parsedText           String?
+  parseError           String?
+  createdAt            DateTime         @default(now())
+  updatedAt            DateTime         @updatedAt
+  overrides            Override[]
+
+  @@index([batchId, createdAt])
+}
+
+model Override {
+  id             String      @id @default(cuid())
+  batchItemId    String
+  batchItem      BatchItem   @relation(fields: [batchItemId], references: [id], onDelete: Cascade)
+  originalLabel  String?
+  finalLabel     String?
+  originalStatus String?
+  finalStatus    String?
+  reasonTag      String?
+  freeTextReason String?
+  createdAt      DateTime    @default(now())
+
+  @@index([batchItemId, createdAt])
+}
